@@ -1,1 +1,0 @@
-return require(script.Parent.FFlagEnableAEGIS2CommsFAEUpsell) and game:DefineFastFlag("EnableAEGIS2AppChatBannerv699", false);

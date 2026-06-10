@@ -1,1 +1,0 @@
-return game:DefineFastFlag("EnableAEGIS1AppChatBanner4", false);
