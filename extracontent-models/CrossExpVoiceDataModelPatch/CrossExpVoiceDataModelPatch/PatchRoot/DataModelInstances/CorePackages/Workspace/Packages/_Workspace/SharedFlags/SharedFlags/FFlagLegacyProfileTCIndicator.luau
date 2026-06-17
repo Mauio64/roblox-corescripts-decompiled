@@ -1,1 +1,0 @@
-return game:DefineFastFlag("LegacyProfileTCIndicator_V3", false);
