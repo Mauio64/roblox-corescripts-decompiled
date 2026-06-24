@@ -1,1 +1,0 @@
-return require(script.Parent.FFlagAXMigrateAXFocusBehaviorRoot) and game:DefineFastFlag("AXMigrateEditEmotesPageInputBindingsToFocusNavigation", false);

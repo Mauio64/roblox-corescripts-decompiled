@@ -1,3 +1,0 @@
-return {
-    DiscoveryOta = "discovery-ota"
-};

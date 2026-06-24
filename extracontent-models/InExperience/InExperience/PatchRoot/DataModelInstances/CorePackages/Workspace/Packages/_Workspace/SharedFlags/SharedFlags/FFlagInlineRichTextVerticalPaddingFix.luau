@@ -1,1 +1,0 @@
-return game:DefineFastFlag("InlineRichTextVerticalPaddingFix1", false);

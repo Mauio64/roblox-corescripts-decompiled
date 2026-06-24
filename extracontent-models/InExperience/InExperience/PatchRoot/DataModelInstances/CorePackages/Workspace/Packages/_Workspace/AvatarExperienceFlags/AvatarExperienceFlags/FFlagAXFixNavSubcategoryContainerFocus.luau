@@ -1,2 +1,0 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceFlags").Parent;
-return require(l_Parent_0.SharedFlags).FFlagAXMigrateAXFocusBehaviorRoot and game:DefineFastFlag("AXFixNavSubcategoryContainerFocus", false);

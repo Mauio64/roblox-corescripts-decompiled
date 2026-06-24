@@ -1,2 +1,0 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-return require(l_Parent_0.SharedFlags).FFlagInlineRichTextVerticalPaddingFix and game:DefineFastFlag("AppChatGroupOsaViewDetailsLink1", false);

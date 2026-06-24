@@ -1,1 +1,0 @@
-return game:DefineFastFlag("AddFriendsTileTCIndicatorLabel_V2", false);

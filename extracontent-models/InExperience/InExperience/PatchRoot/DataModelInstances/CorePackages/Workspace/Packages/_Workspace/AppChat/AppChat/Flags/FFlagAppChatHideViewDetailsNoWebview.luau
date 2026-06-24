@@ -1,1 +1,0 @@
-return require(script.Parent.FFlagAppChatGroupOsaViewDetailsLink) and game:DefineFastFlag("AppChatHideViewDetailsNoWebview", false);
